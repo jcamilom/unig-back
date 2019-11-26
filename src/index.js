@@ -34,7 +34,13 @@ app.post('/users', (req, resp) => {
   });
 });
 app.put('/users', () => console.log('update'));
-app.delete('/users', () => console.log('delete'));
+app.delete('/users', (req, resp) => {
+  User.destroy({ where: {
+    email: req.body.email
+  }}).then((user) => {
+    resp.send()
+  });
+});
 
 app.listen(port, () => {
   console.log('app running');
