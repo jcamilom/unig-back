@@ -1,49 +1,22 @@
 const Sequelize = require('sequelize');
+const UserModel = require('../models/users')
 
-var sequelize = new Sequelize('ug', 'root', '1234ng', {
+const DB_NAME = 'ug';
+const DB_USER = 'root';
+const DB_PASS = '1234ng';
+
+var sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   host: 'localhost',
   dialect: 'mysql'
 });
 
-const User = sequelize.define('user', {
-  name: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  surname: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  birthday: Sequelize.DATE,
-  phoneNumber: Sequelize.STRING,
-  profilePicture: Sequelize.STRING,
-  identification: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  email: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    unique: true
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
+const User = UserModel(sequelize, Sequelize);
+
+User.sync({ force: true }).then(function () {
+  console.log(`Database & tables created!`);
 });
 
-User.sync({force: true}).then(function () {
-  // Table created
-  return User.create({
-    name: 'Pedro',
-    surname: 'Cuartas',
-    birthday: new Date(1980, 5, 25),
-    identification: '1234-9876',
-    email: 'pedro@mail.com',
-    password: '12345678',
-    phoneNumber: '765-333'
-  });
-});
+module.exports = { User };
 
 // User
 // name
