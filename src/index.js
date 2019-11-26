@@ -34,11 +34,18 @@ app.post('/users', (req, resp) => {
   });
 });
 app.put('/users', () => console.log('update'));
-app.delete('/users', (req, resp) => {
-  User.destroy({ where: {
-    email: req.body.email
-  }}).then((user) => {
-    resp.send()
+app.delete('/users/:id', (req, resp) => {
+  User.findByPk(req.params.id).then((user) => {
+    if (!user) {
+      return resp.status(404).send()
+    }
+    User.destroy({ where: {
+      id: user.id
+    }}).then((user) => {
+      resp.send()
+    }).catch(e => {
+      resp.status(500).send();
+    }) 
   });
 });
 
