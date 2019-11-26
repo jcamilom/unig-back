@@ -6,13 +6,30 @@ var sequelize = new Sequelize('ug', 'root', '1234ng', {
 });
 
 const User = sequelize.define('user', {
-  name: Sequelize.STRING,
-  surname: Sequelize.STRING,
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  surname: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
   birthday: Sequelize.DATE,
-  identification: Sequelize.STRING,
-  email: Sequelize.STRING,
-  password: Sequelize.STRING,
-  phoneNumber: Sequelize.STRING
+  phoneNumber: Sequelize.STRING,
+  profilePicture: Sequelize.STRING,
+  identification: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  email: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    unique: true
+  },
+  password: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
 });
 
 User.sync({force: true}).then(function () {
@@ -31,11 +48,11 @@ User.sync({force: true}).then(function () {
 // User
 // name
 // surname
-// birthday
+// birthday (opt)
 // identification
 // email
 // password
-// phoneNumber
+// phoneNumber (opt)
 
 // id
 // created_at
