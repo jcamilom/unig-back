@@ -12,14 +12,25 @@ app.post('/login', (req, resp) => {
     email: req.body.email,
     password: req.body.password
   }}).then(function(user) {
+    if (!user) {
+      return resp.status(404).send()
+    }
     resp.send(user);
+  }).catch(e => {
+    resp.status(500).send();
   });
 });
 app.post('/users', (req, resp) => {
-  const birthday = req.body.birthday.split('/');
-  req.body.birthday = new Date(+birthday[0], +birthday[1] - 1, +birthday[2])
+  try {
+    const birthday = req.body.birthday.split('/');
+    req.body.birthday = new Date(+birthday[0], +birthday[1] - 1, +birthday[2])
+  } catch(e) {
+    resp.status(400).send();
+  }
   User.create(req.body).then(user => {
     resp.status(201).send(user);
+  }).catch(e => {
+    resp.status(500).send();
   });
 });
 app.put('/users', () => console.log('update'));
