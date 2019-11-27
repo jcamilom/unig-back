@@ -53,7 +53,11 @@ app.patch('/users/:id', async (req, resp) => {
   } catch (e) {
     if (e.name === 'SequelizeValidationError') {
       return resp.status(400).send(e.message);
+    } else if (e.name === 'SequelizeUniqueConstraintError') {
+      return resp.status(400).send('Email is already being used');
     }
+    console.log(e.name)
+    console.log(e.message)
     resp.status(500).send();
   }
 });
