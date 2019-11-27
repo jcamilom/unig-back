@@ -30,6 +30,7 @@ app.post('/users', async (req, resp) => {
     const user = await User.create(req.body);
     resp.status(201).send(user);
   } catch (e) {
+    console.log(e)
     resp.status(500).send();
   }
 });
