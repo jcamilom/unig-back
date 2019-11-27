@@ -7,68 +7,67 @@ const port = 3000;
 
 app.use(express.json())
 
-app.post('/login', (req, resp) => {
-  User.findOne({
-    where: {
-      email: req.body.email,
-      password: req.body.password
-    }
-  }).then(function (user) {
-    if (!user) {
-      return resp.status(404).send()
-    }
-    resp.send(user);
-  }).catch(e => {
-    resp.status(500).send();
-  });
-});
-
-app.post('/users', (req, resp) => {
+app.post('/login', async (req, resp) => {
   try {
-    const birthday = req.body.birthday.split('/');
-    req.body.birthday = new Date(+birthday[0], +birthday[1] - 1, +birthday[2])
-  } catch (e) {
-    resp.status(400).send();
-  }
-  User.create(req.body).then(user => {
-    resp.status(201).send(user);
-  }).catch(e => {
-    resp.status(500).send();
-  });
-});
+    const user = await User.findOne({
+      where: {
+        email: req.body.email,
+        password: req.body.password
+      }
+    });
 
-app.patch('/users/:id', (req, resp) => {
-  User.findByPk(req.params.id).then((user) => {
     if (!user) {
       return resp.status(404).send();
     }
-    User.update(req.body, {
+    resp.send(user);
+  } catch (e) {
+    resp.status(500).send();
+  }
+});
+
+app.post('/users', async (req, resp) => {
+  try {
+    const user = await User.create(req.body);
+    resp.status(201).send(user);
+  } catch (e) {
+    resp.status(500).send();
+  }
+});
+
+app.patch('/users/:id', async (req, resp) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) {
+      return resp.status(404).send();
+    }
+    await User.update(req.body, {
       where: {
         id: req.params.id
       }
-    }).then(() => {
-      resp.send();
-    }).catch(e => {
-      resp.status(500).send();
     });
-  });
+    resp.send();
+  } catch (e) {
+    resp.status(500).send();
+  }
 });
 
-app.delete('/users/:id', (req, resp) => {
-  User.findByPk(req.params.id).then((user) => {
+app.delete('/users/:id', async (req, resp) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
     if (!user) {
-      return resp.status(404).send()
+      return resp.status(404).send();
     }
-    User.destroy({
+    await User.destroy({
       where: {
         id: user.id
       }
-    }).then((user) => {
-      resp.send()
-    }).catch(e => {
-      resp.status(500).send();
     })
-  });
+    resp.send();
+  } catch (e) {
+    resp.status(500).send();
+  }
 });
 
 app.listen(port, () => {
