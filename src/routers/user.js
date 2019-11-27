@@ -13,7 +13,7 @@ router.post('/login', async (req, resp) => {
     });
 
     if (!user) {
-      return resp.status(404).send();
+      return resp.status(404).send({ error: 'Invalid credentials' });
     }
     resp.send(user);
   } catch (e) {
@@ -27,7 +27,7 @@ router.post('/users', async (req, resp) => {
     resp.status(201).send(user);
   } catch (e) {
     if (e.name === 'SequelizeValidationError') {
-      return resp.status(400).send(e.message);
+      return resp.status(400).send({ error: e.message });
     }
     resp.status(500).send();
   }
@@ -46,7 +46,7 @@ router.patch('/users/:id', async (req, resp) => {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return resp.status(404).send();
+      return resp.status(404).send({ error: 'User does not exist' });
     }
     await User.update(req.body, {
       where: {
@@ -56,12 +56,10 @@ router.patch('/users/:id', async (req, resp) => {
     resp.send();
   } catch (e) {
     if (e.name === 'SequelizeValidationError') {
-      return resp.status(400).send(e.message);
+      return resp.status(400).send({ error: e.message });
     } else if (e.name === 'SequelizeUniqueConstraintError') {
-      return resp.status(400).send('Email is already being used');
+      return resp.status(400).send({ error: 'Email is already being used' });
     }
-    console.log(e.name)
-    console.log(e.message)
     resp.status(500).send();
   }
 });
@@ -71,7 +69,7 @@ router.delete('/users/:id', async (req, resp) => {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return resp.status(404).send();
+      return resp.status(404).send({ error: 'User does not exist' });
     }
     await User.destroy({
       where: {
