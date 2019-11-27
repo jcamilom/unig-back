@@ -34,6 +34,14 @@ router.post('/users', async (req, resp) => {
 });
 
 router.patch('/users/:id', async (req, resp) => {
+  const allowedUpdates = ['name', 'surname', 'identification', 'birthdate', 'phoneNumber', 'profilePicture', 'email', 'password'];
+  const updates = Object.keys(req.body);
+  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return resp.status(400).send({ error: 'Invalid update!' });
+  }
+  
   try {
     const user = await User.findByPk(req.params.id);
 
