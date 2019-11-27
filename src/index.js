@@ -70,6 +70,15 @@ app.delete('/users/:id', async (req, resp) => {
   }
 });
 
+app.get('/users', async (req, resp) => {
+  try {
+    const users = await User.findAll();
+    resp.send(users);
+  } catch (e) {
+    resp.status(500).send();
+  }
+});
+
 app.listen(port, () => {
   console.log('app running');
 });
