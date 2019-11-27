@@ -18,7 +18,7 @@ module.exports = (sequelize, types) => {
         len: [3, 50]
       }
     },
-    birthday: {
+    birthdate: {
       type: types.DATEONLY,
       validate: {
         isDate: true
