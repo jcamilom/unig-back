@@ -30,7 +30,9 @@ app.post('/users', async (req, resp) => {
     const user = await User.create(req.body);
     resp.status(201).send(user);
   } catch (e) {
-    console.log(e)
+    if (e.name === 'SequelizeValidationError') {
+      return resp.status(400).send(e.message);
+    }
     resp.status(500).send();
   }
 });
@@ -49,6 +51,9 @@ app.patch('/users/:id', async (req, resp) => {
     });
     resp.send();
   } catch (e) {
+    if (e.name === 'SequelizeValidationError') {
+      return resp.status(400).send(e.message);
+    }
     resp.status(500).send();
   }
 });

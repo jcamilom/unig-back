@@ -64,12 +64,12 @@ module.exports = (sequelize, types) => {
   }, {
     hooks: {
       beforeValidate: (user, options) => {
-        user.name = user.name.trim();
-        user.surname = user.surname.trim();
-        user.identification = user.identification.trim();
-        user.email = user.email.trim().toLowerCase();
-        user.phoneNumber = user.phoneNumber.trim();
-        user.profilePicture = user.profilePicture.trim();
+        if (typeof user.name === 'string') user.name = user.name.trim();
+        if (typeof user.surname === 'string') user.surname = user.surname.trim();
+        if (typeof user.identification === 'string') user.identification = user.identification.trim();
+        if (typeof user.email === 'string') user.email = user.email.trim().toLowerCase();
+        if (typeof user.phoneNumber === 'string') user.phoneNumber = user.phoneNumber.trim();
+        if (typeof user.profilePicture === 'string') user.profilePicture = user.profilePicture.trim();
       }
     }
   });
