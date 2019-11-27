@@ -61,6 +61,17 @@ module.exports = (sequelize, types) => {
         len: [8, 16]
       }
     },
+  }, {
+    hooks: {
+      beforeValidate: (user, options) => {
+        user.name = user.name.trim();
+        user.surname = user.surname.trim();
+        user.identification = user.identification.trim();
+        user.email = user.email.trim().toLowerCase();
+        user.phoneNumber = user.phoneNumber.trim();
+        user.profilePicture = user.profilePicture.trim();
+      }
+    }
   });
   return User;
 }
