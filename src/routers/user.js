@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const { User } = require('../db/db');
 
 const router = new express.Router();
@@ -7,14 +8,19 @@ router.post('/login', async (req, resp) => {
   try {
     const user = await User.findOne({
       where: {
-        email: req.body.email,
-        password: req.body.password
+        email: req.body.email
       }
     });
 
     if (!user) {
       return resp.status(404).send({ error: 'Invalid credentials' });
     }
+
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) {
+      return resp.status(404).send({ error: 'Invalid credentials' });
+    }
+
     resp.send(user);
   } catch (e) {
     resp.status(500).send();
