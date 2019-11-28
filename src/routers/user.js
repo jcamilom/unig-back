@@ -57,7 +57,8 @@ router.patch('/users/:id', async (req, resp) => {
     await User.update(req.body, {
       where: {
         id: req.params.id
-      }
+      },
+      individualHooks: true
     });
     resp.send();
   } catch (e) {
