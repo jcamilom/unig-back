@@ -5,24 +5,34 @@ const { ErrorBadRequest, ErrorNotFound } = require('../common/custom-errors');
 class UserController {
 
   async create(data) {
-    let user;
-    switch (data.type) {
-      case 'teacher':
-        const teacher = {
-          employeeId: data.employeeId,
-          user: { ...data }
-        };
-        user = await Teacher.create(teacher, {
-          include: User
-        });
-        break;
-      case 'user':
-        user = await User.create(data);
-        break;
-      default:
-        throw new ErrorBadRequest(`User of type ${data.type} is not supported`);
+    try {
+      let user;
+      switch (data.type) {
+        case 'teacher':
+          const teacher = {
+            employeeId: data.employeeId,
+            user: { ...data }
+          };
+          user = await Teacher.create(teacher, {
+            include: User
+          });
+          break;
+        case 'user':
+          user = await User.create(data);
+          break;
+        default:
+          throw new ErrorBadRequest(`User of type ${data.type} is not supported`);
+      }
+      return await user;
+    } catch (e) {
+      if (e.name === 'SequelizeValidationError') {
+        throw new ErrorBadRequest(e.message);
+      } else if (e.name === 'SequelizeUniqueConstraintError') {
+        throw new ErrorBadRequest('Email is already being used');
+      }
+      throw e;
     }
-    return await user;
+    
   }
 
   async login(email, password) {
@@ -41,6 +51,50 @@ class UserController {
       throw new ErrorNotFound('Invalid credentials');
     }
     return user;
+  }
+
+  async update(id, updates) {
+    const allowedUpdates = ['name', 'surname', 'identification', 'birthdate', 'phoneNumber', 'profilePicture', 'email', 'password'];
+    const updatesKeys = Object.keys(updates);
+    const isValidOperation = updatesKeys.every((updateKey) => allowedUpdates.includes(updateKey));
+
+
+    try {
+      if (!isValidOperation) {
+        throw new ErrorBadRequest('Invalid update!');
+      }
+      const user = await User.findByPk(id);
+
+      if (!user) {
+        throw new ErrorNotFound('User does not exist');
+      }
+      await User.update(updates, {
+        where: {
+          id: id
+        },
+        individualHooks: true
+      });
+    } catch (e) {
+      if (e.name === 'SequelizeValidationError') {
+        throw new ErrorBadRequest(e.message);
+      } else if (e.name === 'SequelizeUniqueConstraintError') {
+        throw new ErrorBadRequest('Email is already being used');
+      }
+      throw e;
+    }
+  }
+
+  async delete(id) {
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      throw new ErrorNotFound('User does not exist');
+    }
+    await User.destroy({
+      where: {
+        id: user.id
+      }
+    });
   }
 
 }

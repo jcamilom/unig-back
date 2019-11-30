@@ -1,12 +1,12 @@
 const express = require('express');
 const { User } = require('../db/db');
 const UserController = require('../controllers/user');
-const { ErrorBadRequest, ErrorNotFound } = require('../common/custom-errors');
 
 const router = new express.Router();
 
 const userController = new UserController();
 
+// LOGIN
 router.post('/login', async (req, resp) => {
   try {
     const user = await userController.login(req.body.email, req.body.password);
@@ -16,6 +16,7 @@ router.post('/login', async (req, resp) => {
   }
 });
 
+// REGISTER
 router.post('/users', async (req, resp) => {
   try {
     const user = await userController.create(req.body);
@@ -25,58 +26,23 @@ router.post('/users', async (req, resp) => {
   }
 });
 
+// UPDATE
 router.patch('/users/:id', async (req, resp) => {
-  const allowedUpdates = ['name', 'surname', 'identification', 'birthdate', 'phoneNumber', 'profilePicture', 'email', 'password'];
-  const updates = Object.keys(req.body);
-  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
-
-  
   try {
-    if (!isValidOperation) {
-      throw new ErrorBadRequest('Invalid update!');
-    }
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) {
-      throw new ErrorNotFound('User does not exist');
-    }
-    await User.update(req.body, {
-      where: {
-        id: req.params.id
-      },
-      individualHooks: true
-    });
-    resp.send();
+    const user = await userController.update(req.params.id, req.body);
+    resp.send(user);
   } catch (e) {
-    if (e.statusCode) {
-      return resp.status(e.statusCode).send({ error: e.message }); 
-    } else if (e.name === 'SequelizeValidationError') {
-      return resp.status(400).send({ error: e.message });
-    } else if (e.name === 'SequelizeUniqueConstraintError') {
-      return resp.status(400).send({ error: 'Email is already being used' });
-    }
-    resp.status(500).send();
+    handleError(e, resp);
   }
 });
 
+// DELETE
 router.delete('/users/:id', async (req, resp) => {
   try {
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) {
-      throw new ErrorNotFound('User does not exist');
-    }
-    await User.destroy({
-      where: {
-        id: user.id
-      }
-    })
+    userController.delete(req.params.id);
     resp.send();
   } catch (e) {
-    if (e.statusCode) {
-      return resp.status(e.statusCode).send({ error: e.message }); 
-    }
-    resp.status(500).send();
+    handleError(e, resp);
   }
 });
 
@@ -91,11 +57,7 @@ router.get('/users', async (req, resp) => {
 
 function handleError(e, resp) {
   if (e.statusCode) {
-    return resp.status(e.statusCode).send({ error: e.message }); 
-  } else if (e.name === 'SequelizeValidationError') {
-    return resp.status(400).send({ error: e.message });
-  } else if (e.name === 'SequelizeUniqueConstraintError') {
-    return resp.status(400).send({ error: 'Email is already being used' });
+    return resp.status(e.statusCode).send({ error: e.message });
   }
   resp.status(500).send();
 }
