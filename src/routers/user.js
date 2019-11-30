@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { User, Teacher } = require('../db/db');
+const { ErrorBadRequest, ErrorNotFound } = require('../common/custom-errors');
 
 const router = new express.Router();
 
@@ -13,16 +14,19 @@ router.post('/login', async (req, resp) => {
     });
 
     if (!user) {
-      return resp.status(404).send({ error: 'Invalid credentials' });
+      throw new ErrorNotFound('Invalid credentials');
     }
 
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
-      return resp.status(404).send({ error: 'Invalid credentials' });
+      throw new ErrorNotFound('Invalid credentials');
     }
 
     resp.send(user);
   } catch (e) {
+    if (e.statusCode) {
+      return resp.status(e.statusCode).send({ error: e.message }); 
+    }
     resp.status(500).send();
   }
 });
@@ -44,11 +48,13 @@ router.post('/users', async (req, resp) => {
         user = await User.create(req.body);
         break;
       default:
-        resp.status(404).send({ error: `User of type ${req.body.type} is not supported` })
+        throw new ErrorBadRequest(`User of type ${req.body.type} is not supported`);
     }
     resp.status(201).send(user);
   } catch (e) {
-    if (e.name === 'SequelizeValidationError') {
+    if (e.statusCode) {
+      return resp.status(e.statusCode).send({ error: e.message }); 
+    } else if (e.name === 'SequelizeValidationError') {
       return resp.status(400).send({ error: e.message });
     } else if (e.name === 'SequelizeUniqueConstraintError') {
       return resp.status(400).send({ error: 'Email is already being used' });
@@ -62,15 +68,15 @@ router.patch('/users/:id', async (req, resp) => {
   const updates = Object.keys(req.body);
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
-  if (!isValidOperation) {
-    return resp.status(400).send({ error: 'Invalid update!' });
-  }
   
   try {
+    if (!isValidOperation) {
+      throw new ErrorBadRequest('Invalid update!');
+    }
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return resp.status(404).send({ error: 'User does not exist' });
+      throw new ErrorNotFound('User does not exist');
     }
     await User.update(req.body, {
       where: {
@@ -80,7 +86,9 @@ router.patch('/users/:id', async (req, resp) => {
     });
     resp.send();
   } catch (e) {
-    if (e.name === 'SequelizeValidationError') {
+    if (e.statusCode) {
+      return resp.status(e.statusCode).send({ error: e.message }); 
+    } else if (e.name === 'SequelizeValidationError') {
       return resp.status(400).send({ error: e.message });
     } else if (e.name === 'SequelizeUniqueConstraintError') {
       return resp.status(400).send({ error: 'Email is already being used' });
@@ -94,7 +102,7 @@ router.delete('/users/:id', async (req, resp) => {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return resp.status(404).send({ error: 'User does not exist' });
+      throw new ErrorNotFound('User does not exist');
     }
     await User.destroy({
       where: {
@@ -103,6 +111,9 @@ router.delete('/users/:id', async (req, resp) => {
     })
     resp.send();
   } catch (e) {
+    if (e.statusCode) {
+      return resp.status(e.statusCode).send({ error: e.message }); 
+    }
     resp.status(500).send();
   }
 });
