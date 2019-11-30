@@ -1,9 +1,10 @@
 const bcrypt = require('bcryptjs');
 
-module.exports = (sequelize, types) => {
-  const User = sequelize.define('user', {
+module.exports = (sequelize, Model, DataTypes) => {
+  class User extends Model {}
+  User.init({
     name: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         is: /^[a-zA-Z\s]+$/i,
@@ -12,7 +13,7 @@ module.exports = (sequelize, types) => {
       }
     },
     surname: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         is: /^[a-zA-Z\s]+$/i,
@@ -21,25 +22,25 @@ module.exports = (sequelize, types) => {
       }
     },
     birthdate: {
-      type: types.DATEONLY,
+      type: DataTypes.DATEONLY,
       validate: {
         isDate: true
       }
     },
     phoneNumber: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       validate: {
         is: /^[(]{0,1}[+]?[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/i,
       }
     },
     profilePicture: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       validate: {
         isUrl: true
       }
     },
     identification: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         is: /^[a-zA-Z0-9\s-]+$/i,
@@ -48,7 +49,7 @@ module.exports = (sequelize, types) => {
       }
     },
     email: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
@@ -57,13 +58,15 @@ module.exports = (sequelize, types) => {
       }
     },
     password: {
-      type: types.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         len: [8, 16]
       }
     },
   }, {
+    sequelize,
+    modelName: 'user',
     hooks: {
       beforeValidate: (user) => {
         if (typeof user.name === 'string') user.name = user.name.trim();
