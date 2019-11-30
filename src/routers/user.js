@@ -1,5 +1,4 @@
 const express = require('express');
-const { User } = require('../db/db');
 const UserController = require('../controllers/user');
 
 const router = new express.Router();
@@ -39,19 +38,20 @@ router.patch('/users/:id', async (req, resp) => {
 // DELETE
 router.delete('/users/:id', async (req, resp) => {
   try {
-    userController.delete(req.params.id);
+    await userController.delete(req.params.id);
     resp.send();
   } catch (e) {
     handleError(e, resp);
   }
 });
 
+// GET ALL
 router.get('/users', async (req, resp) => {
   try {
-    const users = await User.findAll();
+    const users = await userController.getAll();
     resp.send(users);
   } catch (e) {
-    resp.status(500).send();
+    handleError(e, resp);
   }
 });
 

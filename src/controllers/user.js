@@ -32,13 +32,12 @@ class UserController {
       }
       throw e;
     }
-    
   }
 
   async login(email, password) {
     const user = await User.findOne({
       where: {
-        email: email
+        email
       }
     });
 
@@ -58,7 +57,6 @@ class UserController {
     const updatesKeys = Object.keys(updates);
     const isValidOperation = updatesKeys.every((updateKey) => allowedUpdates.includes(updateKey));
 
-
     try {
       if (!isValidOperation) {
         throw new ErrorBadRequest('Invalid update!');
@@ -70,7 +68,7 @@ class UserController {
       }
       await User.update(updates, {
         where: {
-          id: id
+          id
         },
         individualHooks: true
       });
@@ -95,6 +93,10 @@ class UserController {
         id: user.id
       }
     });
+  }
+
+  async getAll() {
+    return await User.findAll();
   }
 
 }
