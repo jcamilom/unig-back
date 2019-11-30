@@ -1,65 +1,27 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const { User, Teacher } = require('../db/db');
+const { User } = require('../db/db');
+const UserController = require('../controllers/user');
 const { ErrorBadRequest, ErrorNotFound } = require('../common/custom-errors');
 
 const router = new express.Router();
 
+const userController = new UserController();
+
 router.post('/login', async (req, resp) => {
   try {
-    const user = await User.findOne({
-      where: {
-        email: req.body.email
-      }
-    });
-
-    if (!user) {
-      throw new ErrorNotFound('Invalid credentials');
-    }
-
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
-    if (!isMatch) {
-      throw new ErrorNotFound('Invalid credentials');
-    }
-
+    const user = await userController.login(req.body.email, req.body.password);
     resp.send(user);
   } catch (e) {
-    if (e.statusCode) {
-      return resp.status(e.statusCode).send({ error: e.message }); 
-    }
-    resp.status(500).send();
+    handleError(e, resp);
   }
 });
 
 router.post('/users', async (req, resp) => {
   try {
-    let user;
-    switch (req.body.type) {
-      case 'teacher':
-        const teacher = {
-          employeeId: req.body.employeeId,
-          user: { ...req.body }
-        };
-        user = await Teacher.create(teacher, {
-          include: User
-        });
-        break;
-      case 'user':
-        user = await User.create(req.body);
-        break;
-      default:
-        throw new ErrorBadRequest(`User of type ${req.body.type} is not supported`);
-    }
+    const user = await userController.create(req.body);
     resp.status(201).send(user);
   } catch (e) {
-    if (e.statusCode) {
-      return resp.status(e.statusCode).send({ error: e.message }); 
-    } else if (e.name === 'SequelizeValidationError') {
-      return resp.status(400).send({ error: e.message });
-    } else if (e.name === 'SequelizeUniqueConstraintError') {
-      return resp.status(400).send({ error: 'Email is already being used' });
-    }
-    resp.status(500).send();
+    handleError(e, resp);
   }
 });
 
@@ -126,5 +88,16 @@ router.get('/users', async (req, resp) => {
     resp.status(500).send();
   }
 });
+
+function handleError(e, resp) {
+  if (e.statusCode) {
+    return resp.status(e.statusCode).send({ error: e.message }); 
+  } else if (e.name === 'SequelizeValidationError') {
+    return resp.status(400).send({ error: e.message });
+  } else if (e.name === 'SequelizeUniqueConstraintError') {
+    return resp.status(400).send({ error: 'Email is already being used' });
+  }
+  resp.status(500).send();
+}
 
 module.exports = router;
