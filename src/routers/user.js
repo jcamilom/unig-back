@@ -50,6 +50,8 @@ router.post('/users', async (req, resp) => {
   } catch (e) {
     if (e.name === 'SequelizeValidationError') {
       return resp.status(400).send({ error: e.message });
+    } else if (e.name === 'SequelizeUniqueConstraintError') {
+      return resp.status(400).send({ error: 'Email is already being used' });
     }
     resp.status(500).send();
   }
