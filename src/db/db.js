@@ -21,13 +21,12 @@ sequelize.sync({ force: true }).then(function () {
   console.log(`Database & tables created!`);
   User.create(
     {
-      "type": "teacher",
       "name": "Horacio",
       "surname": "Lopez",
       "identification": "123456789",
       "phoneNumber": "332-543-3333",
       "profilePicture": "http://mypic.com",
-      "email": "horacio2@mail.com",
+      "email": "horacio@mail.com",
       "password": "pass1234",
       "birthdate": "1979-03-18",
     }
@@ -39,7 +38,7 @@ sequelize.sync({ force: true }).then(function () {
   })
 });
 
-module.exports = { User };
+module.exports = { User, Teacher };
 
 // User
 // name

@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { User } = require('../db/db');
+const { User, Teacher } = require('../db/db');
 
 const router = new express.Router();
 
@@ -29,7 +29,23 @@ router.post('/login', async (req, resp) => {
 
 router.post('/users', async (req, resp) => {
   try {
-    const user = await User.create(req.body);
+    let user;
+    switch (req.body.type) {
+      case 'teacher':
+        const teacher = {
+          employeeId: req.body.employeeId,
+          user: { ...req.body }
+        };
+        user = await Teacher.create(teacher, {
+          include: User
+        });
+        break;
+      case 'user':
+        user = await User.create(req.body);
+        break;
+      default:
+        resp.status(404).send({ error: `User of type ${req.body.type} is not supported` })
+    }
     resp.status(201).send(user);
   } catch (e) {
     if (e.name === 'SequelizeValidationError') {
