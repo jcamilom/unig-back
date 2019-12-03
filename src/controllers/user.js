@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { User, Teacher } = require('../db/db');
 const { ErrorBadRequest, ErrorNotFound } = require('../common/custom-errors');
 
@@ -49,7 +50,13 @@ class UserController {
     if (!isMatch) {
       throw new ErrorNotFound('Invalid credentials');
     }
-    return user;
+    const token = jwt.sign({ id: user.id.toString() }, 'my-secret-key', { expiresIn: 600 });
+    await User.update({ token }, {
+      where: {
+        id: user.id
+      }
+    });
+    return { user, token };
   }
 
   async update(id, updates) {

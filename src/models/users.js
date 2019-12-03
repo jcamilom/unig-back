@@ -64,6 +64,7 @@ module.exports = (sequelize, Model, DataTypes) => {
         len: [8, 16]
       }
     },
+    token: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'user',

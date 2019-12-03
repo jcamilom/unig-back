@@ -8,8 +8,8 @@ const userController = new UserController();
 // LOGIN
 router.post('/login', async (req, resp) => {
   try {
-    const user = await userController.login(req.body.email, req.body.password);
-    resp.send(user);
+    const data = await userController.login(req.body.email, req.body.password);
+    resp.send(data);
   } catch (e) {
     handleError(e, resp);
   }
