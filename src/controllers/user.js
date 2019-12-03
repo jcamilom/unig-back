@@ -24,7 +24,7 @@ class UserController {
         default:
           throw new ErrorBadRequest(`User of type ${data.type} is not supported`);
       }
-      return await user;
+      return await this.generateToken(user);
     } catch (e) {
       if (e.name === 'SequelizeValidationError') {
         throw new ErrorBadRequest(e.message);
@@ -50,6 +50,10 @@ class UserController {
     if (!isMatch) {
       throw new ErrorNotFound('Invalid credentials');
     }
+    return await this.generateToken(user);
+  }
+
+  async generateToken(user) {
     const token = jwt.sign({ id: user.id.toString() }, 'my-secret-key', { expiresIn: 600 });
     await User.update({ token }, {
       where: {
@@ -58,7 +62,7 @@ class UserController {
     });
     return { user, token };
   }
-
+  
   async update(id, updates) {
     const allowedUpdates = ['name', 'surname', 'identification', 'birthdate', 'phoneNumber', 'profilePicture', 'email', 'password'];
     const updatesKeys = Object.keys(updates);

@@ -18,8 +18,8 @@ router.post('/login', async (req, resp) => {
 // REGISTER
 router.post('/users', async (req, resp) => {
   try {
-    const user = await userController.create(req.body);
-    resp.status(201).send(user);
+    const data = await userController.create(req.body);
+    resp.status(201).send(data);
   } catch (e) {
     handleError(e, resp);
   }
