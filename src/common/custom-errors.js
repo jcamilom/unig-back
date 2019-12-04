@@ -17,7 +17,14 @@ class ErrorNotFound extends ResponseError {
   }
 }
 
+class ErrorUnauthorized extends ResponseError {
+  constructor(message = 'Unauthorized') {
+    super(401, message);
+  }
+}
+
 module.exports = {
   ErrorBadRequest,
-  ErrorNotFound
+  ErrorNotFound,
+  ErrorUnauthorized
 };

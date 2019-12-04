@@ -1,5 +1,6 @@
 const express = require('express');
 const UserController = require('../controllers/user');
+const auth = require('../middleware/auth');
 
 const router = new express.Router();
 
@@ -26,19 +27,19 @@ router.post('/users', async (req, resp) => {
 });
 
 // UPDATE
-router.patch('/users/:id', async (req, resp) => {
+router.patch('/users', auth, async (req, resp) => {
   try {
-    const user = await userController.update(req.params.id, req.body);
-    resp.send(user);
+    await userController.update(req.user.id, req.body);
+    resp.send();
   } catch (e) {
     handleError(e, resp);
   }
 });
 
 // DELETE
-router.delete('/users/:id', async (req, resp) => {
+router.delete('/users', auth, async (req, resp) => {
   try {
-    await userController.delete(req.params.id);
+    await userController.delete(req.user.id);
     resp.send();
   } catch (e) {
     handleError(e, resp);

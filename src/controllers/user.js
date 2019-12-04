@@ -62,6 +62,28 @@ class UserController {
     });
     return { user, token };
   }
+
+  async authenticate(token) {
+    try {
+      const decoded = jwt.verify(token, 'my-sectret-key');
+      const user = await User.findOne({
+        where: {
+          id: decoded.id,
+          token
+        }
+      });
+
+      if (!user) {
+        throw new ErrorUnauthorized();
+      }
+      return user;
+    } catch (e) {
+      if (e.name === 'JsonWebTokenError' && e.message === 'invalid signature') {
+        throw new ErrorUnauthorized('jwt invalid signature')
+      }
+      throw e
+    }
+  }
   
   async update(id, updates) {
     const allowedUpdates = ['name', 'surname', 'identification', 'birthdate', 'phoneNumber', 'profilePicture', 'email', 'password'];
