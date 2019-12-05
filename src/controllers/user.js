@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, Teacher } = require('../db/db');
-const { ErrorBadRequest, ErrorNotFound } = require('../common/custom-errors');
+const { ErrorBadRequest, ErrorNotFound, ErrorUnauthorized } = require('../common/custom-errors');
 
 class UserController {
 
@@ -65,7 +65,7 @@ class UserController {
 
   async authenticate(token) {
     try {
-      const decoded = jwt.verify(token, 'my-sectret-key');
+      const decoded = jwt.verify(token, 'my-secret-key');
       const user = await User.findOne({
         where: {
           id: decoded.id,
