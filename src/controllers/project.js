@@ -60,6 +60,19 @@ class ProjectController {
     }
   }
 
+  async delete(id) {
+    const project = await Project.findByPk(id)
+
+    if (!project) {
+      throw new ErrorNotFound(`Project with id '${id}' does not exist`);
+    }
+    await Project.destroy({
+      where: {
+        id: project.id
+      }
+    });
+  }
+
   async getAll() {
     return await Project.findAll();
   }

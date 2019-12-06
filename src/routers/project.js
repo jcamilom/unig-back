@@ -36,6 +36,16 @@ router.patch('/projects/:id', auth, async (req, resp) => {
   }
 });
 
+// DELETE
+router.delete('/projects/:id', auth, async (req, resp) => {
+  try {
+    await projectController.delete(req.params.id);
+    resp.send();
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
 // GET ALL
 router.get('/projects', async (req, resp) => {
   try {
