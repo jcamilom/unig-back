@@ -14,8 +14,8 @@ var sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
 const User = UserModel(sequelize, Model, DataTypes);
 const Teacher = TeacherModel(sequelize, Model, DataTypes);
 
+User.hasOne(Teacher, { foreingKey: 'userId', sourceKey: 'id'});
 Teacher.belongsTo(User);
-// User.hasOne(Teacher);
 
 sequelize.sync({ force: true }).then(function () {
   console.log(`Database & tables created!`);
