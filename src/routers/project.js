@@ -6,6 +6,16 @@ const router = new express.Router();
 
 const projectController = new ProjectController();
 
+// CREATE PROJECT
+router.post('/projects', auth, async (req, resp) => {
+  try {
+    const project = await projectController.create(req.body);
+    resp.status(201).send(project);
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
 // GET ALL
 router.get('/projects', async (req, resp) => {
   try {
