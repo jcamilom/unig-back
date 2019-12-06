@@ -106,7 +106,14 @@ class ProjectController {
         });
         await TeacherProject.bulkCreate(newRecords);
       } else if (type == 'remove') {
-
+        teachersId.forEach(async (teacherId) => {
+          await TeacherProject.destroy({
+            where: {
+              teacherId,
+              projectId
+            }
+          });
+        });
       } else {
         throw new ErrorBadRequest(`update type '${type}' not supported`);
       }
