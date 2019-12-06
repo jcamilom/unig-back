@@ -26,6 +26,16 @@ router.get('/projects/:id', auth, async (req, resp) => {
   }
 });
 
+// UPDATE
+router.patch('/projects/:id', auth, async (req, resp) => {
+  try {
+    await projectController.update(req.params.id, req.body);
+    resp.send();
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
 // GET ALL
 router.get('/projects', async (req, resp) => {
   try {
