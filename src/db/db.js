@@ -2,6 +2,7 @@ const { Sequelize, Model, DataTypes } = require('sequelize');
 const UserModel = require('../models/users')
 const TeacherModel = require('../models/teacher');
 const ProjectModel = require('../models/project');
+const TeacherProjectModel = require('../models/teacher-project');
 
 const DB_NAME = 'ug';
 const DB_USER = 'root';
@@ -15,12 +16,13 @@ var sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
 const User = UserModel(sequelize, Model, DataTypes);
 const Teacher = TeacherModel(sequelize, Model, DataTypes);
 const Project = ProjectModel(sequelize, Model, DataTypes);
+const TeacherProject = TeacherProjectModel(sequelize, Model, DataTypes);
 
 User.hasOne(Teacher, { foreingKey: 'userId', sourceKey: 'id' });
 Teacher.belongsTo(User);
 
-// Teacher.belongsToMany(Project, { through: TeacherProjects });
-// Project.belongsToMany(Teacher, { through: TeacherProjects });
+Teacher.belongsToMany(Project, { through: TeacherProject });
+Project.belongsToMany(Teacher, { through: TeacherProject });
 
 sequelize.sync({ force: true }).then(async function () {
   console.log(`Database & tables created!`);
@@ -44,7 +46,7 @@ sequelize.sync({ force: true }).then(async function () {
   });
 });
 
-module.exports = { User, Teacher };
+module.exports = { User, Teacher, Project, TeacherProject };
 
 // User
 // name
