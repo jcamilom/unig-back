@@ -1,4 +1,4 @@
-const { Project } = require('../db/db');
+const { Project, TeacherProject } = require('../db/db');
 const { ErrorBadRequest, ErrorNotFound, ErrorUnauthorized } = require('../common/custom-errors');
 
 class ProjectController {
@@ -71,6 +71,15 @@ class ProjectController {
         id: project.id
       }
     });
+  }
+
+  async getTeachers(projectId) {
+    const teachers = await TeacherProject.findAll({
+      where: {
+        projectId
+      }
+    });
+    return teachers
   }
 
   async getAll() {

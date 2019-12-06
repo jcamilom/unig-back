@@ -26,6 +26,16 @@ router.get('/projects/:id', auth, async (req, resp) => {
   }
 });
 
+// GET PROJECT'S TEACHERS
+router.get('/projects/:id/teachers', auth, async (req, resp) => {
+  try {
+    const teachers = await projectController.getTeachers(req.params.id);
+    resp.send(teachers);
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
 // UPDATE
 router.patch('/projects/:id', auth, async (req, resp) => {
   try {
