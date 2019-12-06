@@ -1,4 +1,4 @@
-const { Project, TeacherProject } = require('../db/db');
+const { Project, TeacherProject, Teacher } = require('../db/db');
 const { ErrorBadRequest, ErrorNotFound, ErrorUnauthorized } = require('../common/custom-errors');
 
 class ProjectController {
@@ -74,12 +74,50 @@ class ProjectController {
   }
 
   async getTeachers(projectId) {
+    const project = await Project.findByPk(projectId)
+
+    if (!project) {
+      throw new ErrorNotFound(`Project with id '${projectId}' does not exist`);
+    }
+
     const teachers = await TeacherProject.findAll({
       where: {
         projectId
       }
     });
     return teachers
+  }
+
+  async updateTeachers(projectId, teachersId, type) {
+    try {
+      const project = await Project.findByPk(projectId)
+
+      if (!project) {
+        throw new ErrorNotFound(`Project with id '${projectId}' does not exist`);
+      }
+
+      if (type === 'add') {
+        const newRecords = [];
+        teachersId.forEach(teacherId => {
+          newRecords.push({
+            teacherId,
+            projectId
+          });
+        });
+        await TeacherProject.bulkCreate(newRecords);
+      } else if (type == 'remove') {
+
+      } else {
+        throw new ErrorBadRequest(`update type '${type}' not supported`);
+      }
+    } catch (e) {
+      if (e.name === 'SequelizeForeignKeyConstraintError') {
+        throw new ErrorBadRequest('One of the users does not exist');
+      } else if (e.name === 'SequelizeUniqueConstraintError') {
+        throw new ErrorBadRequest('One of the relations already exists');
+      }
+      throw e
+    }
   }
 
   async getAll() {

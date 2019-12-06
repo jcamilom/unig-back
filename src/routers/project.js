@@ -26,16 +26,6 @@ router.get('/projects/:id', auth, async (req, resp) => {
   }
 });
 
-// GET PROJECT'S TEACHERS
-router.get('/projects/:id/teachers', auth, async (req, resp) => {
-  try {
-    const teachers = await projectController.getTeachers(req.params.id);
-    resp.send(teachers);
-  } catch (e) {
-    handleError(e, resp);
-  }
-});
-
 // UPDATE
 router.patch('/projects/:id', auth, async (req, resp) => {
   try {
@@ -51,6 +41,26 @@ router.delete('/projects/:id', auth, async (req, resp) => {
   try {
     await projectController.delete(req.params.id);
     resp.send();
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
+// GET PROJECT'S TEACHERS
+router.get('/projects/:id/teachers', auth, async (req, resp) => {
+  try {
+    const teachers = await projectController.getTeachers(req.params.id);
+    resp.send(teachers);
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
+// UPDATE PROJECT'S TEACHERS
+router.patch('/projects/:id/teachers', auth, async (req, resp) => {
+  try {
+    const teachers = await projectController.updateTeachers(req.params.id, req.body.ids, req.body.type);
+    resp.send(teachers);
   } catch (e) {
     handleError(e, resp);
   }
