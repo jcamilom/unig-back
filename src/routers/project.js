@@ -16,6 +16,16 @@ router.post('/projects', auth, async (req, resp) => {
   }
 });
 
+// GET
+router.get('/projects/:id', auth, async (req, resp) => {
+  try {
+    const project = await projectController.get(req.params.id);
+    resp.send(project);
+  } catch (e) {
+    handleError(e, resp);
+  }
+});
+
 // GET ALL
 router.get('/projects', async (req, resp) => {
   try {

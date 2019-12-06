@@ -17,6 +17,16 @@ class ProjectController {
     }
   }
 
+  async get(projectId) {
+    const project = await Project.findByPk(projectId);
+
+    if (!project) {
+      throw new ErrorNotFound(`Project with id '${projectId}' does not exist`);
+    }
+
+    return project;
+  }
+
   async getAll() {
     return await Project.findAll();
   }
