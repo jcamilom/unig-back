@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-module.exports = (sequelize, Model, DataTypes) => {
+module.exports = (sequelize, Model, DataTypes, Role) => {
   class User extends Model {}
   User.init({
     name: {
@@ -65,6 +65,14 @@ module.exports = (sequelize, Model, DataTypes) => {
       }
     },
     token: DataTypes.STRING,
+    roleId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Role,
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'user',
