@@ -3,6 +3,7 @@ const UserModel = require('../models/users')
 const TeacherModel = require('../models/teacher');
 const ProjectModel = require('../models/project');
 const TeacherProjectModel = require('../models/teacher-project');
+const RoleModel = require('../models/role');
 
 const DB_NAME = 'ug';
 const DB_USER = 'root';
@@ -17,6 +18,7 @@ const User = UserModel(sequelize, Model, DataTypes);
 const Teacher = TeacherModel(sequelize, Model, DataTypes);
 const Project = ProjectModel(sequelize, Model, DataTypes);
 const TeacherProject = TeacherProjectModel(sequelize, Model, DataTypes);
+const Role = RoleModel(sequelize, Model, DataTypes);
 
 User.hasOne(Teacher, { foreingKey: 'userId', sourceKey: 'id' });
 Teacher.belongsTo(User);
@@ -43,6 +45,9 @@ sequelize.sync({ force: true }).then(async function () {
   await Project.create({
     name: 'Programacion orientada a objetos',
     status: true
+  });
+  await Role.create({
+    name: 'teacher'
   });
 });
 
