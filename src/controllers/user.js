@@ -57,7 +57,12 @@ class UserController {
     if (!isMatch) {
       throw new ErrorNotFound('Invalid credentials');
     }
-    return await this.generateToken(user);
+
+    const role = await Role.findByPk(user.roleId);
+    if (!role) {
+      throw new ErrorInternal(`role with id' ${roleId}' not found`);
+    }
+    return await this.generateToken(user, role);
   }
 
   async generateToken(user, role) {
