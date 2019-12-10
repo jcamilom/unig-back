@@ -23,8 +23,15 @@ class ErrorUnauthorized extends ResponseError {
   }
 }
 
+class ErrorInternal extends ResponseError {
+  constructor(message = 'Internal error') {
+    super(500, message);
+  }
+}
+
 module.exports = {
   ErrorBadRequest,
   ErrorNotFound,
-  ErrorUnauthorized
+  ErrorUnauthorized,
+  ErrorInternal
 };

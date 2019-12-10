@@ -31,6 +31,9 @@ sequelize.sync({ force: true }).then(async function () {
   const teacherRole = await Role.create({
     name: 'teacher'
   });
+  const adminRole = await Role.create({
+    name: 'admin'
+  });
   await Teacher.create({
     user: {
       name: "Horacio",
@@ -45,13 +48,31 @@ sequelize.sync({ force: true }).then(async function () {
     }
   }, { include: User });
   console.log(`Test teacher inserted!`);
+  await User.create({
+    name: "Juan",
+    surname: "Ramirez",
+    identification: "11112222",
+    phoneNumber: "332-543-3333",
+    profilePicture: "http://mypic.com",
+    email: "juan@mail.com",
+    password: "pass1234",
+    birthdate: "1979-03-18",
+    roleId: adminRole.id
+  });
+  console.log(`Test admin user inserted!`);
   await Project.create({
     name: 'Programacion orientada a objetos',
     status: true
   });
 });
 
-module.exports = { User, Teacher, Project, TeacherProject };
+module.exports = {
+  User,
+  Teacher,
+  Project,
+  TeacherProject,
+  Role
+};
 
 // User
 // name

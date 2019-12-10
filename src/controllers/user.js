@@ -1,30 +1,37 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User, Teacher } = require('../db/db');
-const { ErrorBadRequest, ErrorNotFound, ErrorUnauthorized } = require('../common/custom-errors');
+const { User, Teacher, Role } = require('../db/db');
+const { ErrorBadRequest, ErrorNotFound, ErrorUnauthorized, ErrorInternal } = require('../common/custom-errors');
 
 class UserController {
 
   async create(data) {
     try {
       let user;
+      let role;
       switch (data.type) {
         case 'teacher':
+          role = await Role.findOne({
+            where: { name: 'teacher' }
+          });
+          if (!role) {
+            throw new ErrorInternal('teacher role not found');
+          }
           const teacher = {
             employeeId: data.employeeId,
-            user: { ...data }
+            user: { ...data, roleId: role.id }
           };
           user = await Teacher.create(teacher, {
             include: User
           });
           break;
-        case 'user':
+        /* case 'user':
           user = await User.create(data);
-          break;
+          break; */
         default:
           throw new ErrorBadRequest(`User of type ${data.type} is not supported`);
       }
-      return await this.generateToken(user);
+      return await this.generateToken(user, role);
     } catch (e) {
       if (e.name === 'SequelizeValidationError') {
         throw new ErrorBadRequest(e.message);
@@ -53,8 +60,12 @@ class UserController {
     return await this.generateToken(user);
   }
 
-  async generateToken(user) {
-    const token = jwt.sign({ id: user.id.toString() }, 'my-secret-key', { expiresIn: 600 });
+  async generateToken(user, role) {
+    const rawToken = {
+      id: user.id.toString(),
+      role: role.name
+    };
+    const token = jwt.sign(rawToken, 'my-secret-key', { expiresIn: 600 });
     await User.update({ token }, {
       where: {
         id: user.id
