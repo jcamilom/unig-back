@@ -70,7 +70,8 @@ sequelize.sync({ force: true }).then(async function () {
   console.log(`Test admin user inserted!`);
   await Resource.bulkCreate([
     { path: '/projects/:id', method: 'GET' },
-    { path: '/projects', method: 'GET' }
+    { path: '/projects', method: 'GET' },
+    { path: '/projects', method: 'POST' }
   ]);
   console.log(`Test resources inserted!`);
   await ResourceRole.bulkCreate([
@@ -95,7 +96,9 @@ module.exports = {
   Teacher,
   Project,
   TeacherProject,
-  Role
+  Role,
+  Resource,
+  ResourceRole
 };
 
 // User
