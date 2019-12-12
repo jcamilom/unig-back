@@ -7,7 +7,7 @@ const router = new express.Router();
 const teacherController = new TeacherController();
 
 // GET ALL
-router.get('/teachers', async (req, resp) => {
+router.get('/teachers', auth, async (req, resp) => {
   try {
     const teachers = await teacherController.getAll();
     resp.send(teachers);

@@ -28,7 +28,20 @@ async function init(sequelize, User, Teacher, Project, TeacherProject, Role, Res
           birthdate: "1979-03-18",
         }
       }, { include: User });
-      console.log(`---> Test teacher inserted!`);
+      console.log(`---> Test teacher Horacio inserted!`);
+      const teacher2 = await Teacher.create({
+        user: {
+          name: "Pedro",
+          surname: "Ramirez",
+          identification: "123456789",
+          phoneNumber: "332-543-3333",
+          profilePicture: "http://mypic.com",
+          email: "pedro@mail.com",
+          password: "pass1234",
+          birthdate: "1979-03-18",
+        }
+      }, { include: User });
+      console.log(`---> Test teacher Pedro inserted!`);
       const user = await User.create({
         name: "Juan",
         surname: "Ramirez",
@@ -42,7 +55,9 @@ async function init(sequelize, User, Teacher, Project, TeacherProject, Role, Res
       console.log('---> Test user created!');
       console.log("=========== Adding roles to users ============");
       await teacher.user.addRole(teacherRole);
-      console.log("---> added teacher role to test teacher");
+      console.log("---> added teacher role to teacher Horacio");
+      await teacher2.user.addRole(teacherRole);
+      console.log("---> added teacher role to teacher Pedro");
       await user.addRole(adminRole);
       console.log("---> added admin role to test user");
       console.log("=========== Project creation ============");
@@ -55,7 +70,8 @@ async function init(sequelize, User, Teacher, Project, TeacherProject, Role, Res
       await Resource.bulkCreate([
         { path: '/projects/:id', method: 'GET' },
         { path: '/projects', method: 'GET' },
-        { path: '/projects', method: 'POST' }
+        { path: '/projects', method: 'POST' },
+        { path: '/teachers', method: 'GET' }
       ]);
       console.log(`---> Test resources inserted!`);
       console.log("=========== Resources - Roles associations ============");
@@ -67,6 +83,14 @@ async function init(sequelize, User, Teacher, Project, TeacherProject, Role, Res
         {
           roleId: teacherRole.id,
           resourceId: 2
+        },
+        {
+          roleId: teacherRole.id,
+          resourceId: 3
+        },
+        {
+          roleId: teacherRole.id,
+          resourceId: 4
         }
       ]);
       console.log(`---> Test role-resources association inserted!`);
