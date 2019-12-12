@@ -57,6 +57,9 @@ router.get('/users', async (req, resp) => {
 });
 
 function handleError(e, resp) {
+  console.log(e.name)
+  console.log(e.message)
+  console.log(e)
   if (e.statusCode) {
     return resp.status(e.statusCode).send({ error: e.message });
   }
