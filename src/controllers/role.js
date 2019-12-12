@@ -3,7 +3,7 @@ const { ErrorInternal } = require('../common/custom-errors');
 
 class RoleController {
 
-  async validateResource(roleId, path, method) {
+  async validateResource(user, path, method) {
     const resource = await Resource.findOne({
       where: { path, method }
     });
@@ -12,17 +12,21 @@ class RoleController {
       throw new ErrorInternal('The resource does not exist');
     }
 
-    const resourceRole = await ResourceRole.findOne({
-      where: {
-        roleId,
-        resourceId: resource.id
+    const roles = await user.getRoles();
+    for (let role of roles) {
+      const hasPermission = await ResourceRole.findOne({
+        where: {
+          roleId: role.id,
+          resourceId: resource.id
+        }
+      });
+  
+      if (hasPermission) {
+        return true;
       }
-    });
-
-    if (resourceRole) {
-      return true;
     }
-    return false;
+    
+    return false; 
   }
 
 }

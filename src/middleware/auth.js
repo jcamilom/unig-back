@@ -14,7 +14,7 @@ const auth = async (req, resp, next) => {
       const user = await userController.authenticate(token);
       req.user = user;
       // Authorization
-      const isAuthorized = await roleController.validateResource(user.roleId, req.route.path, req.method);
+      const isAuthorized = await roleController.validateResource(user, req.route.path, req.method);
       if (isAuthorized) {
         next();
       } else {

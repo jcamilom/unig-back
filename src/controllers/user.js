@@ -20,12 +20,12 @@ class UserController {
             throw new ErrorInternal('teacher role not found');
           }
           const teacher = {
-            employeeId: data.employeeId,
-            user: { ...data, roleId: role.id }
+            user: { data }
           };
           user = await Teacher.create(teacher, {
             include: User
           });
+          user.user.addRole(role);
           break;
         /* case 'user':
           user = await User.create(data);
@@ -33,7 +33,7 @@ class UserController {
         default:
           throw new ErrorBadRequest(`User of type ${data.type} is not supported`);
       }
-      return await this.generateToken(user, role);
+      return await this.generateToken(user, [role]);
     } catch (e) {
       if (e.name === 'SequelizeValidationError') {
         throw new ErrorBadRequest(e.message);
@@ -60,17 +60,19 @@ class UserController {
       throw new ErrorNotFound('Invalid credentials');
     }
 
-    const role = await Role.findByPk(user.roleId);
-    if (!role) {
-      throw new ErrorInternal(`role with id' ${roleId}' not found`);
-    }
-    return await this.generateToken(user, role);
+    const roles = await user.getRoles();
+
+    return await this.generateToken(user, roles);
   }
 
-  async generateToken(user, role) {
+  async generateToken(user, roles) {
+    const userRoles = [];
+    roles.forEach(role => {
+      userRoles.push(role.name);
+    });
     const rawToken = {
       id: user.id.toString(),
-      role: role.name
+      role: userRoles
     };
     const token = jwt.sign(rawToken, jwtSecretKey, { expiresIn: 600 });
     await User.update({ token }, {
