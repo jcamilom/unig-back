@@ -7,12 +7,10 @@ const RoleModel = require('../models/role');
 const ResourceModel = require('../models/resource');
 const ResourceRoleModel = require('../models/resource-role');
 
-const DB_NAME = 'ug';
-const DB_USER = 'root';
-const DB_PASS = '1234ng';
+const { dbHost, dbName, dbUser, dbPass } = require('../config/config'); 
 
-var sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
-  host: 'localhost',
+var sequelize = new Sequelize(dbName, dbUser, dbPass, {
+  host: dbHost,
   dialect: 'mysql'
 });
 
@@ -115,16 +113,3 @@ module.exports = {
   Resource,
   ResourceRole
 };
-
-// User
-// name
-// surname
-// birthday (opt)
-// identification
-// email
-// password
-// phoneNumber (opt)
-
-// id
-// created_at
-// updated_at

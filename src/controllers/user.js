@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const { User, Teacher, Role } = require('../db/db');
 const { ErrorBadRequest, ErrorNotFound, ErrorUnauthorized, ErrorInternal } = require('../common/custom-errors');
 
+const { jwtSecretKey } = require('../config/config');
+
 class UserController {
 
   async create(data) {
@@ -70,7 +72,7 @@ class UserController {
       id: user.id.toString(),
       role: role.name
     };
-    const token = jwt.sign(rawToken, 'my-secret-key', { expiresIn: 600 });
+    const token = jwt.sign(rawToken, jwtSecretKey, { expiresIn: 600 });
     await User.update({ token }, {
       where: {
         id: user.id
@@ -81,7 +83,7 @@ class UserController {
 
   async authenticate(token) {
     try {
-      const decoded = jwt.verify(token, 'my-secret-key');
+      const decoded = jwt.verify(token, jwtSecretKey);
       const user = await User.findOne({
         where: {
           id: decoded.id,

@@ -3,8 +3,9 @@ const userRouter = require('./routers/user');
 const teacherRouter = require('./routers/teacher');
 const projectRouter = require('./routers/project');
 
+const { port } = require('./config/config');
+
 const app = express();
-const port = 3000;
 
 app.use(express.json())
 app.use(userRouter);
