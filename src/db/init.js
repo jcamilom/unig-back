@@ -71,7 +71,8 @@ async function init(sequelize, User, Teacher, Project, TeacherProject, Role, Res
         { path: '/projects/:id', method: 'GET' },
         { path: '/projects', method: 'GET' },
         { path: '/projects', method: 'POST' },
-        { path: '/teachers', method: 'GET' }
+        { path: '/teachers', method: 'GET' },
+        { path: '/projects/:id/teachers', method: 'PATCH' },
       ]);
       console.log(`---> Test resources inserted!`);
       console.log("=========== Resources - Roles associations ============");
@@ -91,6 +92,10 @@ async function init(sequelize, User, Teacher, Project, TeacherProject, Role, Res
         {
           roleId: teacherRole.id,
           resourceId: 4
+        },
+        {
+          roleId: teacherRole.id,
+          resourceId: 5
         }
       ]);
       console.log(`---> Test role-resources association inserted!`);
